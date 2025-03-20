@@ -18,7 +18,7 @@ const checkAuth = (req) => {
 // ✅ Get All Users
 exports.getUsers = async (req, res) => {
     try {
-        const users = await User.find().select("-password"); // Exclude password
+        const users = await User.find().select("-password");
         res.status(200).json({ isAuthenticated: checkAuth(req), users });
     } catch (error) {
         res.status(500).json({ message: "Server error" });
@@ -48,7 +48,7 @@ exports.updateScores = async (req, res) => {
                 communication_score,
                 aptitude_score,
                 technical_score,
-                overall_score: (communication_score + aptitude_score + technical_score) / 3, // Auto-calculate overall score
+                overall_score: (communication_score + aptitude_score + technical_score) / 3,
             },
             { new: true }
         );
