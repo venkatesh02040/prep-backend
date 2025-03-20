@@ -1,49 +1,90 @@
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-exports.signup = async (req, res) => {
-    try {
-      const { name, email, password } = req.body;
-  
-      let user = await User.findOne({ email });
-      if (user) return res.status(400).json({ message: "User already exists" });
-  
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-  
-      user = new User({ name, email, password: hashedPassword });
-      await user.save();
-  
-      res.status(201).json({
-        message: "User registered successfully",
-        user: {
-          id: user._id, // Send _id as id
-          name: user.name,
-          email: user.email,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Server error" });
-    }
-  };
+// Middleware: Check authentication without exposing the token
+const checkAuth = (req) => {
+    const token = req.header("Authorization");
+    if (!token) return false;
 
-  exports.login = async (req, res) => {
     try {
-      const { email, password } = req.body;
-  
-      let user = await User.findOne({ email });
-      if (!user) return res.status(400).json({ message: "User not found" });
-  
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-  
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-  
-      res.status(200).json({ token, user });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        return true;
     } catch (error) {
-      res.status(500).json({ message: "Server error" });
+        return false;
     }
-  };
-  
-  
+};
+
+// ✅ Get All Users
+exports.getUsers = async (req, res) => {
+    try {
+        const users = await User.find().select("-password"); // Exclude password
+        res.status(200).json({ isAuthenticated: checkAuth(req), users });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// ✅ Get Single User by ID
+exports.getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select("-password");
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ isAuthenticated: checkAuth(req), user });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// ✅ Update User Scores
+exports.updateScores = async (req, res) => {
+    try {
+        const { communication_score, aptitude_score, technical_score } = req.body;
+
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+                communication_score,
+                aptitude_score,
+                technical_score,
+                overall_score: (communication_score + aptitude_score + technical_score) / 3, // Auto-calculate overall score
+            },
+            { new: true }
+        );
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ isAuthenticated: checkAuth(req), user });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// ✅ Update User Details (Name, Email)
+exports.updateUser = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+
+        const user = await User.findByIdAndUpdate(req.params.id, { name, email }, { new: true });
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ isAuthenticated: checkAuth(req), user });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// ✅ Delete User
+exports.deleteUser = async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ isAuthenticated: checkAuth(req), message: "User deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
