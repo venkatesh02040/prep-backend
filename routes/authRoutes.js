@@ -5,7 +5,7 @@ const {
     updateScores,
     updateUser,
     deleteUser
-} = require("../controllers/userControllers");
+} = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
