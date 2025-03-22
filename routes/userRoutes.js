@@ -6,13 +6,15 @@ const {
     updateUser,
     deleteUser
 } = require("../controllers/userControllers");
+const authenticateUser = require("../middleware/authMiddleware"); // Import authentication middleware
 
 const router = express.Router();
 
-router.get("/", getUsers);
-router.get("/:id", getUserById);
-router.put("/:id/score", updateScores);
-router.patch("/:id", updateUser);
-router.delete("/:id", deleteUser);
+// 🔹 Protect all user-related routes with authentication
+router.get("/", authenticateUser, getUsers);
+router.get("/:id", authenticateUser, getUserById);
+router.put("/:id/score", authenticateUser, updateScores);
+router.patch("/:id", authenticateUser, updateUser);
+router.delete("/:id", authenticateUser, deleteUser);
 
 module.exports = router;
