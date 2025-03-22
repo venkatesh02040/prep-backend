@@ -6,11 +6,11 @@ const {
     updateUser,
     deleteUser
 } = require("../controllers/userControllers");
-const authenticateUser = require("../middleware/authMiddleware"); // Import authentication middleware
+const authenticateUser = require("../middleware/authMiddleware"); // Import auth middleware
 
 const router = express.Router();
 
-// 🔹 Require authentication for user-related routes
+// 🔹 Apply authentication middleware before accessing user-related routes
 router.get("/", authenticateUser, getUsers);
 router.get("/:id", authenticateUser, getUserById);
 router.put("/:id/score", authenticateUser, updateScores);

@@ -37,7 +37,6 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        // ✅ Compare the hashed password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
@@ -46,16 +45,10 @@ exports.login = async (req, res) => {
         // Generate JWT Token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-        // Set the token as a secure HTTP-Only Cookie
-        res.cookie("token", token, {
-            httpOnly: true,  
-            secure: true,  // ✅ Required for `SameSite=None` (ensure HTTPS is used)
-            sameSite: "None",  // ✅ Allows cross-origin requests
-            maxAge: 3600000,
-          });          
-
+        // ✅ Send the token in response
         res.status(200).json({
             message: "Login successful",
+            token, // ✅ Frontend will store this token
             user: {
                 id: user._id,
                 name: user.name,
