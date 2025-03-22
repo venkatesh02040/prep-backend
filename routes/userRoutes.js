@@ -10,7 +10,7 @@ const authenticateUser = require("../middleware/authMiddleware"); // Import auth
 
 const router = express.Router();
 
-// 🔹 Protect all user-related routes with authentication
+// 🔹 Require authentication for user-related routes
 router.get("/", authenticateUser, getUsers);
 router.get("/:id", authenticateUser, getUserById);
 router.put("/:id/score", authenticateUser, updateScores);

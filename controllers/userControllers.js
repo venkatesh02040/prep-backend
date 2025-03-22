@@ -13,15 +13,19 @@ exports.getUsers = async (req, res) => {
 // ✅ Get Single User by ID
 exports.getUserById = async (req, res) => {
     try {
-        // Ensure the logged-in user can only fetch their own data
-        if (req.user.id !== req.params.id) {
+        const userId = req.params.id;
+
+        // Ensure the logged-in user is accessing their own data
+        if (req.user.id !== userId) {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 
-        const user = await User.findById(req.params.id).select("-password");
-        if (!user) return res.status(404).json({ message: "User not found" });
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
-        res.status(200).json({ user });
+        res.json(user);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
