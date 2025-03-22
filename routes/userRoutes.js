@@ -2,7 +2,7 @@ const express = require("express");
 const {
     getUsers,
     getUserById,
-    updateScores,
+    updateUserScores,  // Renamed for clarity
     updateUser,
     deleteUser
 } = require("../controllers/userControllers");
@@ -13,7 +13,7 @@ const router = express.Router();
 // 🔹 Apply authentication middleware before accessing user-related routes
 router.get("/", authenticateUser, getUsers);
 router.get("/:id", authenticateUser, getUserById);
-router.put("/:id/score", authenticateUser, updateScores);
+router.patch("/:id/score", authenticateUser, updateUserScores); // Changed from PUT to PATCH
 router.patch("/:id", authenticateUser, updateUser);
 router.delete("/:id", authenticateUser, deleteUser);
 

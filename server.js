@@ -11,13 +11,13 @@ const app = express();
 
 // ✅ Middleware
 app.use(express.json());
-app.use(cookieParser());  // Required for handling HTTP-only cookies
+app.use(cookieParser()); // Required for handling HTTP-only cookies
 
 // ✅ Enable CORS for frontend
 app.use(
   cors({
-    origin: "http://localhost:5173/", // Replace with your frontend URL
-    credentials: true, // ✅ Allows cookies to be sent with requests
+    origin: "http://localhost:5173", // ❌ Removed trailing slash
+    allowedHeaders: ["Content-Type", "Authorization"], // ✅ Explicitly allow Authorization header
   })
 );
 
