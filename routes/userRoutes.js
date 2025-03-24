@@ -15,5 +15,6 @@ router.get("/:id", authenticateUser, getUserById);
 router.put("/:id/score", authenticateUser, updateScores);
 router.patch("/:id", authenticateUser, updateUser);
 router.delete("/:id", authenticateUser, deleteUser);
+router.patch("/guest/reset-scores", resetGuestScores);
 
 module.exports = router;

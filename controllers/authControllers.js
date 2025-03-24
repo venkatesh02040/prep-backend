@@ -54,3 +54,23 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.resetGuestScores = async (req, res) => {
+    try {
+      const guestUser = await User.findOne({ email: "guest@gmail.com" });
+  
+      if (!guestUser) {
+        return res.status(404).json({ message: "Guest user not found" });
+      }
+  
+      guestUser.communication_score = 0;
+      guestUser.aptitude_score = 0;
+      guestUser.technical_score = 0;
+      guestUser.overall_score = 0;
+  
+      await guestUser.save();
+  
+      res.status(200).json({ message: "Guest scores reset successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  };
