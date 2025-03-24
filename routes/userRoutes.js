@@ -4,7 +4,8 @@ const {
     getUserById,
     updateScores,
     updateUser,
-    deleteUser
+    deleteUser,
+    resetGuestScores
 } = require("../controllers/userControllers");
 const authenticateUser = require("../middleware/authMiddleware"); 
 
